@@ -2,6 +2,8 @@
 
 A macOS menu bar widget for Claude Code usage, ported from Omarchy's Agents bar widget. The menu bar shows your session and weekly limits used (`36% · 70%`, red from 90%); click it for the panel.
 
+<p align="center"><img src="docs/screenshot.png" width="436" alt="Agent Usage panel showing session and weekly limits, tokens by day and model, and API-rate cost"></p>
+
 The panel shows:
 
 - **Header:** your plan and the model your latest message used (`MAX 5X · OPUS 5.5`).
@@ -40,6 +42,7 @@ Token totals count input, output, cache read and cache write, deduplicated by me
 swift build                          # debug build
 swift run AgentUsageChecks           # behaviour checks
 swift run AgentUsageChecks --live    # checks, then your real limits and a full transcript scan
+swift run AgentUsage --render-readme-screenshot docs/screenshot.png   # README image, from invented sample data
 ```
 
 The checks are an executable rather than an XCTest target because XCTest and Swift Testing need a full Xcode install, and this builds with Command Line Tools alone.

@@ -22,6 +22,19 @@ final class UsageStore: ObservableObject {
     private var lastLimitsAttempt: Date?
     private var retryNotBefore: Date?
     private var started = false
+    private var isSnapshot = false
+
+    /// A store frozen on fixed data, used to render the README screenshot without anyone's real usage.
+    static func snapshot(limits: [LimitRow], planLabel: String, summary: UsageSummary, now: Date) -> UsageStore {
+        let store = UsageStore()
+        store.isSnapshot = true
+        store.limits = limits
+        store.limitsFetchedAt = now
+        store.planLabel = planLabel
+        store.summary = summary
+        store.now = now
+        return store
+    }
 
     var session: LimitRow? { limits.first { $0.title == "Session" } }
     var weekly: LimitRow? { limits.first { $0.title == "Weekly" } }
@@ -29,7 +42,7 @@ final class UsageStore: ObservableObject {
     var limitsAreStale: Bool { limitsFetchedAt.map { now.timeIntervalSince($0) > staleAfter } ?? false }
 
     func start() {
-        guard !started else { return }
+        guard !started, !isSnapshot else { return }
         started = true
         schedule(every: limitsInterval) { await $0.refreshLimits(force: true) }
         schedule(every: tokensInterval) { await $0.refreshTokens() }
@@ -37,6 +50,7 @@ final class UsageStore: ObservableObject {
     }
 
     func panelOpened() {
+        guard !isSnapshot else { return }
         now = Date()
         Task {
             await refreshLimits(force: false)

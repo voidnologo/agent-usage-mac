@@ -2,7 +2,20 @@ import AgentUsageCore
 import AppKit
 import SwiftUI
 
+/// Runs the menu bar app, or renders the README screenshot when asked to.
 @main
+enum Launcher {
+    static func main() {
+        let arguments = CommandLine.arguments
+        if let flag = arguments.firstIndex(of: "--render-readme-screenshot") {
+            let path = arguments.indices.contains(flag + 1) ? arguments[flag + 1] : "docs/screenshot.png"
+            let rendered = MainActor.assumeIsolated { ReadmeScreenshot.render(to: path) }
+            exit(rendered ? 0 : 1)
+        }
+        AgentUsageApp.main()
+    }
+}
+
 struct AgentUsageApp: App {
     @StateObject private var store = UsageStore()
 
